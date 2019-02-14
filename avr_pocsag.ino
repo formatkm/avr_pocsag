@@ -29,7 +29,7 @@ void loop() {
 
   // init var
   int rc;
-  int state;
+  int state=1;
   address=0;
   addresssource=0;
   msgsize=0;
@@ -113,7 +113,6 @@ void loop() {
         }
         delay(3000);
       };
-      state = 8;
     }
   }
   
