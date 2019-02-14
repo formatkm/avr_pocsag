@@ -16,7 +16,8 @@ bool invert = false;
 Pocsag pocsag;
 int state = 0;
 int pointer = 0;
-
+int point_bit = -1;
+uint8_t *current_bits = (uint8_t*) 0x0;
 
 void loop() {
   // data
@@ -131,5 +132,31 @@ void initTimer()
 void sender() {
   if(state != 6)
     return;
+
+  if(point_bit == -1 && pointer < pocsag.GetSize()) {
+    point_bit = 0;
+    if(current_bits == (uint8_t*) 0x0)
+      current_bits = (uint8_t *)pocsag.GetMsgPointer();
+    else
+      current_bits++;
+    pointer++;
+  }
+
+  if(pointer >= pocsag.GetSize()) {
+    point_bit=-1;
+    pointer = 0;
+    current_bits = (uint8_t*) 0x0;
+    state = 7;
+    digitalWrite(FSK_PIN, 0);
+    return;
+  }
   
+  if(point_bit > -1) {
+    digitalWrite(FSK_PIN, ((*current_bits) >> point_bit) & 0x1);
+    point_bit++;
+  }
+
+  if(point_bit >= 8){
+    point_bit = -1;
+  }
 }
